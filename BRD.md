@@ -8,14 +8,14 @@ Platform Pelaporan Kerusakan Jalan Kota Bogor  \|  Civic-Tech & Weather-Road Int
 
 | Atribut | Keterangan |
 | :---- | :---- |
-| **Versi dokumen** | 0.3 (Draft, nama SIJAGO dan platform teknologi ditambahkan) |
+| **Versi dokumen** | 1.0 (Final — Disesuaikan untuk Kompetisi MIA2026) |
 | **Tanggal** | 25 Oktober 2026 |
-| **Status** | Draft. Rekomendasi default PM sudah diterapkan sebagai keputusan (Bagian 16). Butir berstatus Asumsi kerja menunggu konfirmasi sponsor sebelum dikunci menjadi v1.0 |
-| **Dokumen pendamping** | PRD SIJAGO v0.3 (detail fungsional, data model, edge case, dan tech stack) |
-| **Pemilik dokumen** | Product Manager / Business Analyst |
-| **Sponsor bisnis** | \[Diisi: nama dan jabatan sponsor\] |
+| **Status** | Final (v1.0). Seluruh keputusan bisnis, ruang lingkup MVP, dan arsitektur telah dikunci untuk eksekusi pengembangan proyek kompetisi MIA2026. |
+| **Dokumen pendamping** | PRD SIJAGO v1.0 (detail fungsional, data model, edge case, dan tech stack) |
+| **Pemilik dokumen** | **Sabira** (Product Manager & UI/UX Designer)<br>**Boby** (System Architect & Fullstack Developer) |
+| **Konteks proyek** | Proyek Kompetisi **MIA2026** (Independen, tanpa afiliasi organisasi/sponsor bisnis eksternal) |
 
-| Cara membaca dokumen ini BRD menjelaskan mengapa produk dibuat dan apa kebutuhan bisnisnya. Detail bagaimana sistem berperilaku ada di PRD. Setiap kebutuhan bisnis (BR) dipetakan ke fitur PRD pada Bagian 15\. Angka target adalah usulan awal dan belum berbasis baseline. Kolom bertanda \[Diisi\] menunggu informasi dari sponsor. Tanda \[Usulan BA\] menandai hal yang saya tambahkan karena dibutuhkan agar bisnis dapat berjalan. |
+| Cara membaca dokumen ini: BRD menjelaskan mengapa produk dibuat dan apa kebutuhan bisnisnya. Detail bagaimana sistem berperilaku ada di PRD. Setiap kebutuhan bisnis (BR) dipetakan ke fitur PRD pada Bagian 15. Dalam konteks kompetisi MIA2026, kemitraan instansi disimulasikan secara end-to-end dan seluruh infrastruktur berjalan pada layanan Free Tier. |
 | :---- |
 
 # **Riwayat Dokumen & Daftar Isi**
@@ -25,6 +25,7 @@ Platform Pelaporan Kerusakan Jalan Kota Bogor  \|  Civic-Tech & Weather-Road Int
 | 0.1 | 25 Okt 2026 | Draft awal BRD dari Product Summary & Scope. |
 | 0.2 | 25 Okt 2026 | Rekomendasi default PM diterapkan sebagai keputusan dan asumsi kerja (Bagian 16). |
 | 0.3 | 25 Okt 2026 | Nama produk SIJAGO ditetapkan. Platform teknologi ditambahkan (Bagian 12.4). |
+| 1.0 | 25 Okt 2026 | Dokumen dikunci untuk kompetisi MIA2026. Pemilik dokumen ditetapkan (Sabira & Boby). F9 (Weather-Road Intelligence) dan F10 (Community Sign-Off) ditarik ke Fase 1 (MVP Utama). Simulasi kemitraan instansi, penggunaan layanan Free Tier, serta spesifikasi teknologi (OpenAI `gpt-6-luna`, Cloudinary, Resend, MapLibre + OSM, Multirepo) ditetapkan. |
 
 1\. Ringkasan Eksekutif
 
@@ -56,105 +57,87 @@ Platform Pelaporan Kerusakan Jalan Kota Bogor  \|  Civic-Tech & Weather-Road Int
 
 15\. Implementasi, Adopsi, dan Matriks Keterlacakan
 
-16\. Keputusan, Asumsi Kerja, dan Persetujuan
+16\. Keputusan Kunci dan Pengesahan Dokumen
 
 # **1\. Ringkasan Eksekutif**
 
-**SIJAGO (Sistem Jalan Bogor)** adalah layanan web **mobile-first** yang memudahkan warga Kota Bogor melaporkan kerusakan jalan, membantu pengelola platform memverifikasi dan meneruskan laporan ke instansi yang berwenang, dan memberi instansi (terutama Dinas PUPR) data untuk memprioritaskan perbaikan, termasuk hubungan antara curah hujan BMKG dengan titik kerusakan.
+**SIJAGO (Sistem Jalan Bogor)** adalah layanan web **mobile-first** yang memudahkan warga Kota Bogor melaporkan kerusakan jalan, membantu pengelola platform memverifikasi dan meneruskan laporan ke instansi yang berwenang, dan memberi instansi (terutama Dinas PUPR) data untuk memprioritaskan perbaikan, termasuk hubungan antara curah hujan dengan titik kerusakan jalan.
 
-Nilai bisnis utamanya ada pada tiga hal. Pertama, laporan warga menjadi lebih lengkap, terstruktur, dan sampai ke instansi yang benar. Kedua, tindak lanjut menjadi terlihat dan bisa diawasi komunitas. Ketiga, instansi mendapat dasar data untuk beralih dari perbaikan reaktif ke perbaikan yang lebih tahan lama di zona hujan ekstrem.
+Nilai bisnis utamanya ada pada tiga hal. Pertama, laporan warga menjadi lebih lengkap, terstruktur, dan sampai ke instansi yang benar. Kedua, tindak lanjut menjadi terlihat dan bisa diawasi komunitas melalui fitur *Community Sign-Off*. Ketiga, instansi mendapat dasar data *Weather-Road Intelligence* untuk beralih dari perbaikan reaktif ke perbaikan yang lebih tahan lama di zona hujan ekstrem.
 
-Pembeda utama produk adalah **model hibrida dengan kendali manusia**. AI hanya membantu merapikan teks laporan dan tidak mengambil keputusan. Pengiriman resmi ke instansi hanya terjadi setelah Admin mengonfirmasi, dan seluruh aksi penting tercatat dalam audit log yang tidak dapat diubah. Pendekatan ini dipilih agar platform dapat dipercaya oleh warga dan oleh instansi.
+Pembeda utama produk adalah **model hibrida dengan kendali manusia (*Human-in-the-Loop*)**. AI (`openai gpt-6-luna`) hanya membantu merapikan teks laporan dan tidak mengambil keputusan. Pengiriman resmi ke instansi hanya terjadi setelah Admin mengonfirmasi, dan seluruh aksi penting tercatat dalam audit log yang tidak dapat diubah (*append-only*). Pendekatan ini dipilih agar platform dapat dipercaya oleh warga dan oleh instansi.
 
-### **Hal yang perlu dikonfirmasi sponsor**
+### **Konteks Eksekusi Proyek (MIA2026)**
 
-* Menyetujui tujuan bisnis dan ruang lingkup pada Bagian 3 dan 4\.
-
-* Mengonfirmasi sponsor, pemilik operasional, dan tim Admin (Bagian 5 dan 9).
-
-* Mengonfirmasi strategi kemitraan dengan Dinas PUPR Kota Bogor (OQ-B02).
-
-* Menyetujui pendekatan bertahap: Discovery, pilot terbatas, lalu perluasan (Bagian 15).
+* Dikembangkan sebagai karya kompetisi **MIA2026** oleh tim pengembang independen (**Sabira** sebagai PM & UI/UX Designer, **Boby** sebagai System Architect & Fullstack Developer).
+* Seluruh fitur utama (**F1 hingga F10**, termasuk *Weather-Road Intelligence* dan *Community Sign-Off*) dimasukkan ke dalam **Fase 1 (MVP Utama)** agar diferensiasi produk terlihat utuh saat demonstrasi dan evaluasi.
+* Kemitraan dengan Dinas PUPR Kota Bogor dan instansi terkait **disimulasikan secara penuh** di dalam sistem (mulai dari eskalasi email via Resend, portal instansi, hingga penutupan laporan).
+* Infrastruktur dibangun di atas layanan **Free Tier** dengan arsitektur **Multirepo** (repositori Frontend dan Backend terpisah).
 
 # **2\. Latar Belakang Bisnis dan Peluang**
 
 ## **2.1 Konteks**
 
-Kota Bogor dikenal sebagai Kota Hujan. Intensitas hujan yang tinggi diduga mempercepat kerusakan permukaan jalan, terutama pada titik dengan drainase buruk. Warga menjadi pihak pertama yang mengetahui kerusakan, sedangkan perbaikan menjadi tanggung jawab instansi yang berbeda tergantung status ruas jalan (kota, provinsi, atau nasional).
-
-| Catatan validasi Masalah pada tabel di bawah adalah hipotesis awal dari Product Summary dan belum divalidasi dengan data. Validasi dilakukan pada fase Discovery lewat wawancara warga dan petugas serta analisis kanal aduan yang sudah ada. |
-| :---- |
+Kota Bogor dikenal sebagai Kota Hujan. Intensitas hujan yang tinggi mempercepat kerusakan permukaan jalan, terutama pada titik dengan drainase buruk. Warga menjadi pihak pertama yang mengetahui kerusakan, sedangkan perbaikan menjadi tanggung jawab instansi yang berbeda tergantung status ruas jalan (kota, provinsi, atau nasional).
 
 ## **2.2 Masalah Bisnis**
 
 | Pihak | Masalah | Konsekuensi bisnis |
 | :---- | :---- | :---- |
-| **Warga** | Laporan sulit dibuat lengkap Tidak yakin laporan sampai ke instansi yang benar Tidak ada kepastian status | Partisipasi rendah dan kepercayaan pada kanal aduan menurun |
-| **Instansi** | Laporan tersebar dan formatnya beragam Salah alamat karena kewenangan ruas berbeda Prioritas sulit ditentukan tanpa konteks frekuensi dan cuaca | Perbaikan reaktif, lubang kambuhan, dan pemborosan sumber daya |
-| **Pengelola platform** | Risiko spam, foto palsu, dan laporan duplikat Risiko tuduhan atau data pribadi dalam teks laporan | Reputasi dan hubungan dengan instansi terganggu |
+| **Warga** | Laporan sulit dibuat lengkap, tidak yakin laporan sampai ke instansi yang benar, dan tidak ada kepastian status | Partisipasi rendah dan kepercayaan pada kanal aduan menurun |
+| **Instansi** | Laporan tersebar dan formatnya beragam, salah alamat karena kewenangan ruas berbeda, serta prioritas sulit ditentukan tanpa konteks frekuensi dan cuaca | Perbaikan reaktif, lubang kambuhan, dan pemborosan sumber daya |
+| **Pengelola platform** | Risiko spam, foto palsu, dan laporan duplikat, serta risiko tuduhan atau data pribadi dalam teks laporan | Reputasi dan hubungan dengan instansi terganggu |
 
 ## **2.3 Peluang**
 
-* Teknologi geotagging dan peta membuat laporan berlokasi akurat dengan usaha kecil dari warga.
-
-* AI teks dapat menyeragamkan bahasa laporan bila dibatasi ketat dan diawasi manusia.
-
-* Data cuaca BMKG membuka analisis hujan versus kerusakan yang jarang tersedia bagi instansi tingkat kota. Ketersediaan datanya masih harus diverifikasi (OQ-B07).
-
-* Partisipasi komunitas (+1 dan sign-off) memberi sinyal prioritas dan pengawasan kualitas tanpa biaya inspeksi tambahan.
+* Teknologi geotagging dan peta interaktif (MapLibre GL JS + OpenStreetMap) membuat laporan berlokasi akurat dengan usaha kecil dari warga.
+* AI teks (`openai gpt-6-luna` dengan *reasoning medium*) dapat menyeragamkan bahasa laporan bila dibatasi ketat dan diawasi manusia.
+* Integrasi data cuaca terbuka (BMKG, Open-Meteo, NASA POWER) membuka analisis hujan versus kerusakan yang jarang tersedia bagi instansi tingkat kota.
+* Partisipasi komunitas (+1, tag kondisi, dan *Community Sign-Off*) memberi sinyal prioritas dan pengawasan kualitas tanpa biaya inspeksi tambahan.
 
 ## **2.4 Kondisi Alternatif yang Sudah Ada**
 
-Warga saat ini dapat memakai kanal aduan nasional dan daerah serta media sosial. Posisi platform ini adalah **pelengkap yang berfokus pada jalan**, dengan laporan terstruktur, routing ke instansi yang tepat, dan pelacakan terbuka. Pemetaan kanal eksisting dan celahnya menjadi pekerjaan Discovery (OQ-B09).
+Warga saat ini dapat memakai kanal aduan nasional dan daerah serta media sosial. Posisi SIJAGO adalah **pelengkap yang berfokus khusus pada infrastruktur jalan**, dengan laporan terstruktur, routing ke instansi yang tepat, analitik korelasi cuaca, dan pelacakan terbuka.
 
 # **3\. Tujuan Bisnis**
 
-*Target adalah **usulan** untuk 3 bulan setelah pilot dimulai dan akan direvisi setelah baseline ditetapkan.*
+*Target adalah tolok ukur keberhasilan untuk evaluasi produk dan simulasi pilot.*
 
-| ID | Tujuan bisnis | Ukuran keberhasilan | Target usulan |
+| ID | Tujuan bisnis | Ukuran keberhasilan | Target |
 | :---- | :---- | :---- | :---- |
 | **BO-1** | Meningkatkan kemudahan dan kelengkapan laporan warga | Median waktu pengisian, completion rate, kelengkapan laporan | ≤ 3 menit, ≥ 60%, ≥ 90% |
 | **BO-2** | Memastikan laporan sampai ke instansi yang tepat dengan kualitas terjaga | Waktu verifikasi Admin, tingkat salah routing | ≤ 2 hari kerja, ≤ 10% |
 | **BO-3** | Membangun kepercayaan terhadap pemakaian AI yang aman | Insiden halusinasi lolos, tingkat fallback, tingkat persetujuan draf | 0 kasus, ≤ 5%, ≥ 70% |
-| **BO-4** | Mendorong tindak lanjut instansi yang terlihat dan terawasi | Waktu respons instansi, laporan Selesai yang tidak dibuka kembali | Disepakati bersama PUPR |
-| **BO-5** | Memberi instansi dasar data untuk prioritisasi berbasis cuaca | Petugas aktif di dashboard, titik kambuhan teridentifikasi | ≥ 3 petugas aktif per minggu |
+| **BO-4** | Mendorong tindak lanjut instansi yang terlihat dan terawasi komunitas | Waktu respons simulasi instansi, laporan Selesai yang terverifikasi lewat *Community Sign-Off* | Siklus penuh tercapai dari lapor hingga sign-off |
+| **BO-5** | Memberi instansi dasar data untuk prioritisasi berbasis cuaca | Ketersediaan visualisasi *Weather-Road Intelligence*, titik kambuhan teridentifikasi | Layer cuaca & zona merah berfungsi penuh |
 | **BO-6** | Menjamin akuntabilitas dan kepatuhan operasional | Cakupan audit log, insiden privasi | 100%, 0 insiden |
 
-**Indikator utama (North Star):** jumlah laporan yang mencapai status Selesai dan tidak dibuka kembali selama masa pemantauan.
+**Indikator utama (North Star):** jumlah laporan yang mencapai status Selesai dan tidak dibuka kembali selama masa pemantauan komunitas.
 
 # **4\. Ruang Lingkup Bisnis**
 
-## **4.1 Dalam Lingkup**
+## **4.1 Dalam Lingkup (MVP Utama / Fase 1)**
 
-* Pelaporan kerusakan jalan oleh warga di wilayah administratif Kota Bogor, dengan foto, lokasi GPS, dan data terstruktur.
-
-* Bantuan AI terbatas untuk menyusun judul dan deskripsi, dengan fallback template dan persetujuan manusia.
-
-* Moderasi, verifikasi, routing manual, dan eskalasi resmi via email oleh Admin SIJAGO.
-
-* Peta publik laporan terverifikasi, dukungan komunitas (+1, tag kondisi), dan pelacakan status.
-
-* Portal sederhana bagi instansi untuk memperbarui status dan mengunggah bukti sebelum-sesudah.
-
-* Audit trail dan version history untuk akuntabilitas.
-
-* Fase 2: dashboard analitik cuaca BMKG dan Community Sign-Off.
+* Pelaporan kerusakan jalan oleh warga di wilayah administratif Kota Bogor, dengan foto (diunggah ke Cloudinary), lokasi GPS, dan data terstruktur.
+* Bantuan AI terbatas (`openai gpt-6-luna`, *reasoning medium*) untuk menyusun judul dan deskripsi, dengan fallback template deterministik dan persetujuan manusia.
+* Moderasi, verifikasi, routing manual, dan eskalasi resmi via email (Resend) oleh Admin SIJAGO.
+* Peta publik laporan terverifikasi (MapLibre GL JS + OpenStreetMap), dukungan komunitas (+1, tag kondisi), dan pelacakan status tanpa login.
+* Portal sederhana bagi instansi (disimulasikan untuk Dinas PUPR/Pemprov/Balai Nasional) untuk memperbarui status dan mengunggah bukti sebelum-sesudah.
+* Audit trail (*append-only*) dan *version history* untuk akuntabilitas.
+* **Weather-Road Intelligence (F9):** Dashboard analitik korelasi curah hujan dengan frekuensi kerusakan jalan dan deteksi titik kambuhan.
+* **Community Sign-Off (F10):** Penilaian kualitas hasil perbaikan oleh warga selama masa pemantauan setelah laporan ditandai Selesai.
 
 ## **4.2 Di Luar Lingkup**
 
 * Pelaksanaan perbaikan fisik jalan dan pengambilan keputusan anggaran perbaikan (tanggung jawab instansi).
-
 * Analisis foto oleh AI, pengukuran kerusakan otomatis, dan penentuan instansi oleh AI.
-
 * Pengiriman otomatis ke instansi tanpa konfirmasi Admin.
-
-* Integrasi dua arah dengan sistem internal pemerintah atau kanal aduan nasional (dapat dipertimbangkan kemudian).
-
-* Aplikasi native, notifikasi WhatsApp, gamifikasi, dan pelaporan di luar Kota Bogor.
+* Integrasi dua arah langsung dengan sistem internal pemerintah atau kanal aduan nasional (kemitraan disimulasikan pada tahap kompetisi).
+* Aplikasi native iOS/Android, notifikasi WhatsApp, gamifikasi, dan pelaporan di luar Kota Bogor.
 
 ## **4.3 Batas Tanggung Jawab**
 
-Platform berperan sebagai **perantara dan pengawas sipil**, bukan pelaksana perbaikan. Platform tidak menjanjikan waktu perbaikan kepada warga dan tidak mewakili instansi pemerintah, kecuali ada kesepakatan resmi (OQ-B02).
+Platform berperan sebagai **perantara dan pengawas sipil**, bukan pelaksana perbaikan. Platform tidak menjanjikan waktu perbaikan kepada warga dan dalam konteks kompetisi MIA2026 menyimulasikan alur kolaborasi dengan instansi pemerintah.
 
 # **5\. Pemangku Kepentingan**
 
@@ -162,47 +145,41 @@ Platform berperan sebagai **perantara dan pengawas sipil**, bukan pelaksana perb
 
 | Pemangku kepentingan | Kepentingan | Pengaruh | Yang mereka butuhkan | Strategi |
 | :---- | :---- | :---- | :---- | :---- |
-| **Sponsor bisnis** | Tinggi | Tinggi | Bukti dampak dan risiko terkendali | Laporan kemajuan berkala dan keputusan pada gerbang fase |
-| **Dinas PUPR Kota Bogor** | Tinggi | Tinggi | Laporan terkurasi, tidak membanjiri, dan tidak mempermalukan | Libatkan sejak Discovery, sediakan jalur ringan, tampilkan nilai lewat dashboard |
-| **Instansi lain (Pemprov Jabar, Balai Nasional)** | Sedang | Tinggi | Laporan yang memang kewenangannya dengan data lokasi jelas | Routing akurat dan mekanisme pengembalian |
-| **Warga dan komunitas** | Tinggi | Sedang | Cara lapor yang cepat dan kepastian status | Uji dengan pengguna, komunikasi status yang jujur |
-| **Admin SIJAGO** | Tinggi | Sedang | Alat moderasi efisien dan SLA yang realistis | Pelatihan, panduan moderasi, dan kapasitas yang jelas |
-| **Tim produk dan engineering** | Tinggi | Sedang | Kebutuhan yang jelas dan stabil | PRD sebagai acuan dan kontrol perubahan |
-| **Penegak kepatuhan, hukum, dan privasi** | Sedang | Tinggi | Kepatuhan data pribadi dan kebijakan konten | Tinjau kebijakan sebelum pilot |
-| **BMKG (penyedia data)** | Rendah | Sedang | Penggunaan data sesuai ketentuan | Pelajari syarat penggunaan dan kuota |
-| **Media dan publik luas** | Sedang | Sedang | Transparansi dan keandalan | Komunikasi hati-hati dan kebijakan konten |
+| **Tim Inti SIJAGO (Sabira & Boby)** | Tinggi | Tinggi | Kebutuhan produk dan arsitektur yang jelas, eksekusi MVP tepat waktu untuk MIA2026 | Menyelaraskan desain UI/UX, PRD, dan implementasi multirepo |
+| **Dewan Juri & Evaluator MIA2026** | Tinggi | Tinggi | Bukti inovasi, keandalan alur *end-to-end*, keamanan AI, dan dampak nyata solusi | Menampilkan demo utuh F1–F10 dengan data realistis Kota Bogor |
+| **Dinas PUPR Kota Bogor (Mitra Simulasi)** | Tinggi | Tinggi | Laporan terkurasi, tidak membanjiri, dan dilengkapi analitik cuaca | Menyediakan simulasi Portal Instansi dan Dashboard Weather-Road Intelligence |
+| **Instansi lain (Pemprov Jabar, Balai Nasional — Simulasi)** | Sedang | Tinggi | Laporan yang sesuai kewenangannya dengan data lokasi jelas | Menyediakan fitur routing akurat dan mekanisme pengembalian laporan |
+| **Warga dan komunitas** | Tinggi | Sedang | Cara lapor yang cepat dan kepastian status | Antarmuka mobile-first tanpa paksaan login di awal |
+| **Admin SIJAGO** | Tinggi | Sedang | Alat moderasi efisien dan kendali penuh atas eskalasi | Menyediakan antrean moderasi, perbandingan EXIF, dan pratinjau email |
 
-## **5.2 Matriks Peran (RACI) \[Usulan BA\]**
+## **5.2 Matriks Peran (RACI)**
 
-R \= Responsible, A \= Accountable, C \= Consulted, I \= Informed.
+R = Responsible, A = Accountable, C = Consulted, I = Informed.
 
-| Aktivitas | Sponsor | Product | Admin | Instansi | Hukum/Privasi |
-| :---- | :---- | :---- | :---- | :---- | :---- |
-| **Menetapkan kebijakan konten dan privasi** | A | R | C | I | C |
-| **Moderasi dan verifikasi laporan** | I | C | R/A | \- | \- |
-| **Routing dan eskalasi ke instansi** | I | C | R/A | I | \- |
-| **Menindaklanjuti dan memperbarui status** | I | \- | C | R/A | \- |
-| **Mengelola konfigurasi dan ambang sistem** | I | A | C | \- | \- |
-| **Audit sampling draf AI dan audit log** | A | R | C | \- | C |
-| **Meninjau aturan rekomendasi teknis (Fase 2\)** | I | A | \- | C | \- |
+| Aktivitas | Sabira (PM & UI/UX) | Boby (System Architect & Fullstack) | Admin (Peran Sistem) | Instansi (Simulasi) |
+| :---- | :---- | :---- | :---- | :---- |
+| **Menetapkan kebutuhan produk, desain UI/UX, dan kebijakan konten** | R/A | C | I | I |
+| **Merancang arsitektur sistem, database, dan integrasi API** | C | R/A | I | I |
+| **Moderasi, verifikasi laporan, routing, dan eskalasi** | C | I | R/A | I |
+| **Menindaklanjuti laporan dan memperbarui bukti perbaikan** | I | I | C | R/A |
+| **Mengelola konfigurasi dan ambang sistem** | A | R | C | \- |
+| **Audit sampling draf AI dan audit log** | R/A | R | C | \- |
 
 # **6\. Proses Bisnis: Kondisi Saat Ini dan Target**
 
-*Kondisi saat ini adalah **hipotesis** yang perlu dikonfirmasi pada fase Discovery.*
-
-| Tahap | Kondisi saat ini (hipotesis) | Kondisi target |
+| Tahap | Kondisi saat ini (masalah umum) | Kondisi target di SIJAGO |
 | :---- | :---- | :---- |
-| **1\. Menemukan dan melapor** | Warga melapor lewat kanal berbeda dengan format bebas, sering tanpa lokasi presisi | Form terstruktur, GPS otomatis, foto, dan bantuan merapikan teks yang harus disetujui warga |
+| **1\. Menemukan dan melapor** | Warga melapor lewat kanal berbeda dengan format bebas, sering tanpa lokasi presisi | Form terstruktur, GPS otomatis, foto, dan bantuan AI (`gpt-6-luna`) merapikan teks yang harus disetujui warga |
 | **2\. Penyaringan** | Tidak ada penyaringan seragam, duplikat dan spam menumpuk | Admin memverifikasi keaslian, menolak spam, dan menggabungkan duplikat |
 | **3\. Penentuan instansi** | Warga atau petugas menebak instansi, risiko salah alamat | Admin memilih instansi berdasarkan kewenangan, instansi dapat mengembalikan bila salah |
-| **4\. Penyampaian** | Tidak seragam dan sulit dilacak | Email resmi berformat baku dikirim setelah konfirmasi Admin, tercatat di audit log |
-| **5\. Tindak lanjut** | Status tidak terlihat oleh warga | Instansi memperbarui status dan bukti sebelum-sesudah, warga melacak lewat tiket |
-| **6\. Pengawasan kualitas** | Tidak ada umpan balik atas hasil perbaikan | Komunitas menilai kualitas tambalan selama masa pemantauan (Fase 2\) |
-| **7\. Perencanaan** | Prioritas berdasarkan laporan masuk tanpa konteks cuaca | Dashboard hujan versus kerusakan dan titik kambuhan untuk instansi (Fase 2\) |
+| **4\. Penyampaian** | Tidak seragam dan sulit dilacak | Email resmi berformat baku dikirim via Resend setelah konfirmasi Admin, tercatat di audit log |
+| **5\. Tindak lanjut** | Status tidak terlihat oleh warga | Instansi memperbarui status dan bukti sebelum-sesudah di portal, warga melacak lewat kode tiket |
+| **6\. Pengawasan kualitas** | Tidak ada umpan balik atas hasil perbaikan | Komunitas menilai kualitas tambalan ("Mulus" / "Cepat Rusak") selama masa pemantauan (*Community Sign-Off*) |
+| **7\. Perencanaan** | Prioritas berdasarkan laporan masuk tanpa konteks cuaca | Dashboard hujan versus kerusakan dan titik kambuhan untuk instansi (*Weather-Road Intelligence*) |
 
 # **7\. Kebutuhan Bisnis**
 
-Prioritas memakai MoSCoW: **Must** wajib untuk pilot, **Should** penting dan menyusul segera, **Could** nilai tambah. Setiap kebutuhan dipetakan ke fitur PRD (F1 sampai F10).
+Seluruh fitur utama (F1 sampai F10) masuk dalam rilis **Fase 1 (MVP Utama)** untuk kompetisi MIA2026. Prioritas memakai MoSCoW: **Must** wajib berfungsi penuh pada MVP, **Should** mendukung pengalaman lengkap.
 
 | ID | Kebutuhan bisnis | Alasan dan tujuan terkait | Prioritas | Fitur PRD |
 | :---- | :---- | :---- | :---- | :---- |
@@ -219,15 +196,15 @@ Prioritas memakai MoSCoW: **Must** wajib untuk pilot, **Should** penting dan men
 | **BR-11** | Semua aksi penting tercatat permanen dan dapat ditelusuri, termasuk riwayat versi fakta dan draf | Akuntabilitas hukum dan operasional (BO-6) | Must | F7 |
 | **BR-12** | Warga dapat melacak status laporan melalui tiket tanpa login | Menjawab masalah ketidakpastian status (BO-1, BO-4) | Must | F8 |
 | **BR-13** | Warga dapat menerima notifikasi perubahan status bila memberi persetujuan | Retensi dan kepercayaan (BO-4) | Should | F8 |
-| **BR-14** | Instansi dapat melihat hubungan curah hujan BMKG dengan frekuensi kerusakan | Prioritisasi berbasis data (BO-5) | Should | F9 |
-| **BR-15** | Sistem menyorot titik kambuhan di zona hujan ekstrem dengan rekomendasi teknis indikatif | Perbaikan yang lebih tahan lama (BO-5) | Should | F9 |
-| **BR-16** | Komunitas dapat menilai kualitas perbaikan selama masa pemantauan, dan laporan dapat dibuka kembali | Pengawasan kualitas hasil (BO-4) | Should | F10 |
+| **BR-14** | Instansi dapat melihat hubungan curah hujan dengan frekuensi kerusakan jalan | Prioritisasi berbasis data (BO-5) | Must | F9 |
+| **BR-15** | Sistem menyorot titik kambuhan di zona hujan ekstrem dengan rekomendasi teknis indikatif | Perbaikan yang lebih tahan lama (BO-5) | Must | F9 |
+| **BR-16** | Komunitas dapat menilai kualitas perbaikan selama masa pemantauan, dan laporan dapat dibuka kembali | Pengawasan kualitas hasil (BO-4) | Must | F10 |
 | **BR-17** | Platform melindungi data pribadi dan mengikuti ketentuan pelindungan data yang berlaku | Kepatuhan dan kepercayaan (BO-6) | Must | NFR |
 | **BR-18** | Admin dan instansi memiliki hak akses sesuai peran dan data antarinstansi terpisah | Keamanan dan tata kelola (BO-6) | Must | F5, F6, F7 |
 | **BR-19** | Parameter bisnis (radius duplikat, masa pemantauan, ambang) dapat diubah tanpa pengembangan ulang | Kelincahan operasional (BO-2, BO-4) | Should | F7 (US-20) |
-| **BR-20** | Layanan inti tetap berjalan bila layanan pendukung (AI, BMKG, peta) terganggu | Keandalan layanan (BO-1, BO-3) | Must | NFR |
+| **BR-20** | Layanan inti tetap berjalan bila layanan pendukung (AI, cuaca, peta) terganggu | Keandalan layanan (BO-1, BO-3) | Must | NFR |
 | **BR-21** | Admin dapat mengirim ulang eskalasi dan mengirim pengingat bila instansi tidak merespons | Menjaga laporan tidak berhenti di tengah jalan (BO-4) | Should | F5 |
-| **BR-22** | Metrik bisnis dapat diukur dan dilaporkan secara berkala kepada sponsor \[Usulan BA\] | Dasar keputusan gerbang fase (semua BO) | Must | NFR (observabilitas) |
+| **BR-22** | Metrik bisnis dapat diukur dan dipantau melalui sistem | Evaluasi dampak produk (semua BO) | Must | NFR (observabilitas) |
 
 # **8\. Aturan Bisnis**
 
@@ -235,54 +212,51 @@ Prioritas memakai MoSCoW: **Must** wajib untuk pilot, **Should** penting dan men
 | :---- | :---- | :---- |
 | **BRL-01** | Fakta Asal dari pelapor adalah sumber kebenaran. Draf AI atau Template hanyalah rangkuman teks dan tidak boleh menambah fakta. | Mencegah misinformasi dan menjaga akuntabilitas |
 | **BRL-02** | AI tidak boleh menganalisis foto, menentukan instansi tujuan, menilai kebenaran, mengubah ukuran, atau menyatakan status selesai. | Keputusan tetap pada manusia |
-| **BRL-03** | Setiap draf wajib berlabel permanen: \[Draf Dibantu AI\] atau \[Draf Template\]. | Transparansi bagi pembaca dan instansi |
+| **BRL-03** | Setiap draf wajib berlabel permanen: `[Draf Dibantu AI]` atau `[Draf Template]`. | Transparansi bagi pembaca dan instansi |
 | **BRL-04** | Warga wajib menyetujui draf sebelum mengirim. Perubahan Fakta Asal setelah draf dibuat membatalkan persetujuan. | Draf selalu sesuai fakta |
 | **BRL-05** | Pemanggilan AI tidak boleh mengirim email atau mengubah status penanganan. | Mencegah efek samping |
 | **BRL-06** | Email resmi ke instansi dan perubahan status menjadi Diteruskan hanya terjadi setelah Admin menekan tombol konfirmasi. | Kendali atas komunikasi resmi |
 | **BRL-07** | Penentuan instansi tujuan dilakukan Admin berdasarkan kewenangan ruas jalan. | Ketepatan routing |
 | **BRL-08** | Admin tidak dapat mengubah Fakta Asal. Koreksi dilakukan lewat catatan Admin. | Integritas data pelapor |
-| **BRL-09** | Hanya laporan terverifikasi yang tampil di peta publik (keputusan OQ-B05). | Melindungi dari spam dan fitnah |
+| **BRL-09** | Hanya laporan terverifikasi yang tampil di peta publik. | Melindungi dari spam dan fitnah |
 | **BRL-10** | Instansi dapat mengembalikan laporan yang bukan kewenangannya dengan alasan, dan Admin melakukan routing ulang. | Mengurangi salah alamat |
 | **BRL-11** | Instansi baru dapat menandai Selesai dengan minimal satu foto bukti perbaikan. | Verifikasi hasil |
 | **BRL-12** | Rekomendasi teknis pada dashboard berlabel indikatif dan bukan pengganti survei teknis. | Mencegah salah tafsir korelasi sebagai sebab-akibat |
 | **BRL-13** | Audit log bersifat append-only dan tidak dapat diubah atau dihapus oleh siapa pun. | Bukti akuntabilitas |
-| **BRL-14** | Identitas pelapor tidak diteruskan ke instansi kecuali pelapor menyetujui (keputusan OQ-B06). | Privasi pelapor |
+| **BRL-14** | Identitas pelapor tidak diteruskan ke instansi kecuali pelapor menyetujui. | Privasi pelapor |
 
 # **9\. Model Operasi dan Tata Kelola**
 
-## **9.1 Model Hibrida**
+## **9.1 Model Hibrida (Simulasi End-to-End)**
 
-Warga melapor, Admin SIJAGO memverifikasi dan meneruskan, instansi mengeksekusi. Model ini dipilih karena platform belum tentu terhubung langsung dengan sistem pemerintah, dan peran moderator independen menjaga kualitas serta netralitas.
+Warga melapor, Admin SIJAGO memverifikasi dan meneruskan, instansi mengeksekusi. Untuk keperluan kompetisi MIA2026, peran Warga, Admin SIJAGO, dan Petugas Instansi (PUPR Kota Bogor, Pemprov Jabar, Balai Nasional) disimulasikan secara penuh di dalam aplikasi sehingga siklus hidup laporan dapat didemonstrasikan dari awal hingga akhir.
 
-## **9.2 Operasional Harian \[Usulan BA\]**
+## **9.2 Operasional Sistem**
 
-| Area | Ketentuan usulan |
+| Area | Ketentuan |
 | :---- | :---- |
-| **Moderasi** | Admin memeriksa antrean pada hari kerja. SLA verifikasi usulan 2 hari kerja (OQ-B04). |
-| **Eskalasi** | Email resmi berformat baku, memuat label draf, koordinat, tautan peta, dan foto. Pengingat manual bila tidak ada respons. |
-| **Kebijakan konten** | Laporan dengan tuduhan, SARA, atau data pribadi pihak lain ditolak atau diminta diperbaiki. Alasan penolakan baku. |
-| **Penanganan keluhan** | Saluran bagi pihak yang laporannya ditolak atau yang merasa dirugikan oleh isi laporan, dengan jawaban dalam waktu yang ditetapkan. |
-| **Pengawasan AI** | Audit sampling berkala atas draf AI. Kasus halusinasi masuk set uji regresi. |
-| **Pelaporan ke sponsor** | Ringkasan metrik bulanan dan tinjauan pada gerbang fase. |
+| **Moderasi** | Admin memeriksa antrean moderasi. Target SLA verifikasi adalah 2 hari kerja. |
+| **Eskalasi** | Email resmi berformat baku dikirim melalui Resend, memuat label draf, koordinat, tautan peta, dan foto. |
+| **Kebijakan konten** | Laporan dengan tuduhan, SARA, atau data pribadi pihak lain ditolak dengan alasan penolakan baku. |
+| **Pengawasan AI** | Validator deterministik pascagenerasi dan audit sampling atas draf AI (`openai gpt-6-luna`). |
 
 ## **9.3 Kepemilikan Data**
 
-Pemilik data laporan, tata kelola retensi, dan hak akses publik ditetapkan oleh sponsor bersama pihak hukum (OQ-B08). Selama belum ada keputusan, asumsi kerja adalah platform bertindak sebagai pengendali data pelapor dan instansi hanya menerima data yang dibutuhkan untuk menindaklanjuti.
+Platform bertindak sebagai pengendali data pelapor dengan prinsip minimisasi data dan pseudonimisasi. Instansi hanya menerima informasi yang dibutuhkan untuk menindaklanjuti perbaikan jalan (tanpa identitas pribadi pelapor kecuali diizinkan).
 
 # **10\. Analisis Biaya dan Manfaat**
 
-Dokumen ini belum memuat angka rupiah karena anggaran dan biaya belum ditetapkan. Tabel berikut menyiapkan kerangka agar sponsor dapat melengkapinya. Saya tidak mengisi angka tanpa dasar.
+## **10.1 Kebijakan Biaya Infrastruktur (Free Tier)**
 
-## **10.1 Komponen Biaya**
+Karena SIJAGO dikembangkan sebagai proyek kompetisi **MIA2026**, proyek ini dirancang untuk berjalan sepenuhnya menggunakan **layanan Free Tier (Rp 0 untuk infrastruktur hosting dan layanan pendukung)**:
 
-| Kategori | Contoh komponen | Perkiraan |
-| :---- | :---- | :---- |
-| **Pengembangan** | Tim produk, desain, engineering, pengujian | \[Diisi\] |
-| **Infrastruktur** | Vercel (frontend), Render (backend), Neon PostgreSQL, penyimpanan objek untuk foto, email transaksional, peta dasar dan geocoding | \[Diisi\] |
-| **AI** | Biaya per permintaan draf dan kuota harian | \[Diisi, tergantung penyedia dan volume\] |
-| **Operasional** | Admin moderator, dukungan, penanganan keluhan | \[Diisi\] |
-| **Kepatuhan** | Tinjauan hukum, kebijakan privasi, uji keamanan | \[Diisi\] |
-| **Adopsi** | Sosialisasi ke warga, pelatihan petugas instansi | \[Diisi\] |
+* **Frontend Hosting:** Vercel (Hobby / Free Tier).
+* **Backend Hosting:** Render (Free Web Service).
+* **Database:** Neon PostgreSQL + PostGIS (Free Tier).
+* **Penyimpanan Foto:** Cloudinary (Free Tier).
+* **Email Transaksional:** Resend (Free Tier).
+* **Peta & Geocoding:** MapLibre GL JS + OpenStreetMap & Nominatim (Gratis & Terbuka).
+* **Data Cuaca:** API Terbuka Gratis (BMKG, Open-Meteo, NASA POWER).
 
 ## **10.2 Komponen Manfaat**
 
@@ -291,122 +265,85 @@ Dokumen ini belum memuat angka rupiah karena anggaran dan biaya belum ditetapkan
 | **Waktu pelaporan dan verifikasi lebih singkat** | Efisiensi | Median waktu pengisian dan verifikasi |
 | **Laporan tepat sasaran, salah routing berkurang** | Efisiensi instansi | Tingkat pengembalian oleh instansi |
 | **Jalan yang diperbaiki lebih cepat atau lebih tahan lama** | Dampak publik | Waktu respons, laporan Selesai tanpa dibuka kembali, titik kambuhan |
-| **Kepercayaan publik pada kanal aduan** | Dampak sosial | Survei kepuasan pelapor dan jumlah pelapor berulang |
-| **Prioritisasi berbasis data** | Kualitas keputusan | Penggunaan dashboard dan umpan balik petugas |
-
-Sebagian besar manfaat bersifat publik dan sulit diubah menjadi pendapatan. Karena itu model pendanaan dan keberlanjutan operasional adalah keputusan penting sponsor (OQ-B03).
+| **Kepercayaan publik pada kanal aduan** | Dampak sosial | Transparansi tiket pelacakan dan partisipasi *Community Sign-Off* |
+| **Prioritisasi berbasis data cuaca** | Kualitas keputusan | Penggunaan dashboard *Weather-Road Intelligence* |
 
 # **11\. Kriteria Keberhasilan dan KPI**
 
-Detail definisi metrik ada di PRD Bagian 2.2. Berikut kriteria untuk keputusan gerbang fase.
+Detail definisi metrik ada di PRD Bagian 2.2. Berikut kriteria keberhasilan untuk pengiriman dan demonstrasi proyek MIA2026:
 
-| Gerbang | Kriteria untuk lanjut |
+| Tahap | Kriteria keberhasilan |
 | :---- | :---- |
-| **Akhir Discovery** | Asumsi kerja berstatus Blocker terkonfirmasi, ada komitmen awal dari instansi (OQ-B02), kebijakan privasi dan konten disiapkan, baseline metrik ditetapkan. |
-| **Akhir Pilot** | Alur dari laporan sampai Selesai berjalan minimal satu siklus bersama instansi, tidak ada halusinasi AI yang lolos ke laporan terkirim, tidak ada insiden privasi, SLA verifikasi tercapai. |
-| **Akhir Fase 2** | Dashboard dipakai petugas, aturan rekomendasi ditinjau ahli, data BMKG terbukti memadai, hasil sign-off terbaca. |
+| **Kesiapan Dokumen & Desain** | BRD v1.0 dan PRD v1.0 terkunci, desain UI/UX selesai oleh Sabira, skema database & API siap oleh Boby. |
+| **Kesiapan MVP Utama (Fase 1 — F1 s/d F10)** | Seluruh alur dari pelaporan warga (F1–F3), peta publik (F4), moderasi & eskalasi Admin (F5), portal instansi (F6), audit log (F7), pelacakan tiket (F8), analitik cuaca (F9), hingga *Community Sign-Off* (F10) berfungsi ujung-ke-ujung tanpa halusinasi AI yang lolos. |
 
 # **12\. Asumsi, Batasan, dan Dependensi**
 
 ## **12.1 Asumsi**
 
-* Ada tim Admin yang bisa memoderasi pada jam kerja.
-
-* Instansi tujuan menyediakan alamat email resmi dan bersedia menerima laporan dari platform.
-
+* Kemitraan dengan Dinas PUPR Kota Bogor dan instansi lain disimulasikan melalui akun peran Petugas Instansi dan email pengujian untuk kebutuhan demonstrasi MIA2026.
 * Warga memiliki ponsel berkamera dan akses internet seluler.
-
-* Akses data BMKG dengan granularitas yang cukup tersedia untuk Bogor (belum diverifikasi).
-
-* Penyedia AI dapat dipakai dengan kebijakan data yang dapat diterima secara hukum.
+* API cuaca gratis (BMKG, Open-Meteo, dll.) dan tile peta OpenStreetMap dapat diakses sesuai kebijakan penggunaan wajar (*fair use*).
 
 ## **12.2 Batasan**
 
-* Platform tidak memiliki kewenangan memaksa instansi bertindak.
-
-* Anggaran, tim, dan tenggat belum ditetapkan.
-
-* Pilot dibatasi pada kapasitas moderasi Admin.
-
-* Rekomendasi teknis tidak boleh diposisikan sebagai pengganti survei teknis.
+* Berjalan pada kuota dan batasan layanan Free Tier (misalnya potensi *cold start* pada Render Free Tier dan batas kuota harian Resend/Cloudinary).
+* Platform tidak memiliki kewenangan memaksa instansi bertindak secara hukum.
+* Rekomendasi teknis pada dashboard cuaca diposisikan sebagai informasi indikatif, bukan pengganti survei teknis lapangan.
 
 ## **12.3 Dependensi**
 
-| Dependensi | Pemilik | Dampak bila terlambat |
+| Dependensi | Pemilik | Dampak bila bermasalah |
 | :---- | :---- | :---- |
-| **Komitmen dan kontak resmi instansi** | Sponsor | Siklus tindak lanjut tidak terbukti |
-| **Kebijakan privasi, syarat layanan, dan kebijakan konten** | Sponsor dan hukum | Pilot tidak dapat dibuka ke publik |
-| **Akses dan syarat penggunaan data BMKG** | Product dan engineering | Fase 2 tertunda atau berubah bentuk |
-| **Penyedia AI, peta, email, dan penyimpanan** | Engineering | Fitur terkait memakai mode fallback |
-| **Daftar ruas jalan dan kewenangannya** | Instansi dan Admin | Salah routing meningkat |
-| **Akun dan paket layanan Vercel, Render, Neon, penyimpanan objek, dan email** | Sponsor dan engineering | Pilot berjalan di paket terbatas atau tertunda |
+| **Desain UI/UX & Spesifikasi Produk** | Sabira | Pengembangan frontend tertunda |
+| **Arsitektur Backend, Database & Integrasi API** | Boby | Fitur inti tidak terhubung |
+| **API OpenAI (`gpt-6-luna`), Cloudinary, Resend** | Boby | Sistem otomatis menggunakan mekanisme fallback (Draf Template) |
+| **API Cuaca Gratis (BMKG / Open-Meteo)** | Boby | Dashboard menampilkan snapshot data terakhir atau data seed Bogor |
 
 ## **12.4 Platform Teknologi**
 
-Pilihan teknologi inti ditetapkan oleh pemilik produk. Rincian lengkap beserta library pendamping ada di PRD Bagian 12\.
+Rincian lengkap arsitektur dan *tech stack* terdapat pada PRD Bagian 12.
 
-| Lapisan | Teknologi | Implikasi bisnis |
+| Lapisan | Teknologi | Catatan |
 | :---- | :---- | :---- |
-| **Frontend** | Next.js, di-deploy di Vercel | Biaya berlangganan bertambah seiring trafik. Halaman publik cepat dan ramah pencarian |
-| **Backend** | Express.js, di-deploy di Render | Instance gratis dapat tertidur saat sepi sehingga pilot sebaiknya memakai paket berbayar |
-| **Database** | Neon PostgreSQL dengan Drizzle ORM | Standar terbuka (PostgreSQL) sehingga risiko ketergantungan pada satu vendor relatif rendah |
-| **Penyimpanan foto dan email** | Object storage dan layanan email terpisah (usulan) | Menambah komponen biaya dan akun yang harus dikelola |
-
-Harga dan kuota tiap layanan belum diverifikasi. Angka biaya diisi sponsor pada Bagian 10 setelah paket dipilih.
+| **Manajemen Kode** | Multirepo (Repositori Frontend & Backend terpisah) | Memudahkan pemisahan deployment ke Vercel dan Render |
+| **Frontend** | Next.js (App Router), di-deploy di Vercel (Free Tier) | Antarmuka mobile-first, cepat, dan responsif |
+| **Backend** | Express.js, di-deploy di Render (Free Tier) | Menangani seluruh logika bisnis, validasi hash, dan audit log |
+| **Database** | Neon PostgreSQL + PostGIS dengan Drizzle ORM (Free Tier) | Menyimpan data relasional, geospasial, dan audit log append-only |
+| **Model AI** | OpenAI `gpt-6-luna` (*reasoning: medium*) | Merapikan judul dan deskripsi laporan dengan kendali validator |
+| **Peta & Geocoding** | MapLibre GL JS + OpenStreetMap (Nominatim) | Peta interaktif dan reverse geocoding gratis |
+| **Penyimpanan Foto & Email** | Cloudinary (Foto) & Resend (Email Transaksional) | Mengelola varian foto tanpa EXIF dan pengiriman email eskalasi |
 
 # **13\. Risiko Bisnis**
 
 | ID | Risiko | Peluang | Dampak | Mitigasi |
 | :---- | :---- | :---- | :---- | :---- |
-| **BR-R1** | Instansi tidak merespons atau tidak mau memakai portal | Tinggi | Tinggi | Kemitraan sejak awal, jalur ringan, override Admin yang transparan, nilai dashboard |
-| **BR-R2** | Ekspektasi publik melebihi kapasitas perbaikan sehingga muncul kekecewaan | Tinggi | Sedang | Komunikasi status yang jujur, tanpa janji waktu perbaikan |
-| **BR-R3** | Platform dianggap menyudutkan instansi atau pejabat | Sedang | Tinggi | Bahasa laporan netral, validator AI, moderasi, dan kebijakan konten |
-| **BR-R4** | Draf AI memuat fakta yang tidak ada | Sedang | Tinggi | Validator, fallback, persetujuan warga, audit sampling |
-| **BR-R5** | Spam, foto palsu, atau laporan fitnah | Sedang | Tinggi | Moderasi sebelum publik, rate limit, pemeriksaan EXIF |
-| **BR-R6** | Beban moderasi melebihi kapasitas | Sedang | Sedang | Pilot terbatas, SLA realistis, antrean berprioritas |
-| **BR-R7** | Pelanggaran atau kebocoran data pribadi | Rendah | Tinggi | Minimisasi data, enkripsi, kebijakan privasi, tinjauan hukum |
-| **BR-R8** | Data BMKG tidak memadai untuk analisis | Sedang | Tinggi | Spike teknis sebelum komitmen Fase 2, rencana sumber alternatif |
-| **BR-R9** | Biaya operasional (terutama AI dan moderasi) tidak berkelanjutan | Sedang | Sedang | Kuota, fallback template, model pendanaan jelas (OQ-B03) |
-| **BR-R10** | Ketergantungan pada satu atau dua orang Admin | Sedang | Sedang | Panduan moderasi dan pelatihan cadangan |
-| **BR-R11** | Keterbatasan paket hosting (layanan tertidur saat sepi, kuota terbatas) mengganggu pengalaman pilot | Sedang | Sedang | Pakai paket berbayar minimal selama pilot, uji beban, dan pantau uptime |
+| **BR-R1** | Keterbatasan layanan Free Tier (Render *cold start*, kuota rate-limit OSM/Resend) saat penjurian | Sedang | Tinggi | Lakukan *warm-up* server sebelum demo, tambahkan cache pada query cuaca/geocoding, dan siapkan fallback |
+| **BR-R2** | Draf AI memuat fakta yang tidak ada di input | Sedang | Tinggi | Validator deterministik pascagenerasi, fallback template, sanding wajib, dan persetujuan warga |
+| **BR-R3** | Spam, foto palsu, atau laporan fitnah | Sedang | Tinggi | Moderasi sebelum publik, rate limit, pemeriksaan EXIF, dan kebijakan konten |
+| **BR-R4** | API cuaca eksternal sedang gangguan atau lambat | Sedang | Sedang | Simpan snapshot cuaca secara lokal di database dan gunakan sumber cadangan dari daftar API gratis |
+| **BR-R5** | Pelanggaran privasi (wajah/pelat nomor atau EXIF bocor ke publik) | Rendah | Tinggi | Hapus EXIF otomatis lewat transformasi Cloudinary dan sediakan fitur blur bagi Admin |
 
 # **14\. Kepatuhan dan Aspek Hukum**
 
-| Penting Bagian ini adalah daftar hal yang perlu ditinjau, bukan nasihat hukum. Penafsiran dan kewajiban spesifik perlu dikonfirmasi oleh penasihat hukum. |
-| :---- |
-
-| Topik | Isu bisnis | Tindakan |
+| Topik | Isu bisnis | Tindakan di dalam sistem |
 | :---- | :---- | :---- |
-| **Pelindungan data pribadi (UU No. 27 Tahun 2022\)** | Foto, lokasi, dan kontak dapat memuat data pribadi. Transfer data ke penyedia AI atau layanan luar negeri | Minimisasi data, persetujuan eksplisit, kebijakan privasi, tinjauan transfer data (OQ-B08) |
-| **Pelayanan publik (UU No. 25 Tahun 2009\)** | Hubungan platform dengan penyelenggara layanan publik dan ekspektasi respons | Konfirmasi posisi platform dan bentuk kerja sama (OQ-B02) |
-| **Konten dan pencemaran nama baik** | Laporan dapat memuat tuduhan terhadap pihak tertentu | Kebijakan konten, moderasi, bahasa netral, saluran keluhan |
-| **Hak atas foto dan privasi pihak ketiga** | Foto bisa memuat wajah dan pelat nomor | Blur dan prosedur penolakan (PRD OQ-11) |
-| **Retensi dan hak subjek data** | Hak hapus vs audit log yang tidak dapat diubah | Pseudonimisasi dan retensi yang ditetapkan hukum (PRD OQ-24) |
-| **Syarat penggunaan data pihak ketiga** | Data BMKG, peta, dan layanan AI memiliki lisensi dan kuota | Tinjau syarat sebelum dipakai (OQ-B07) |
+| **Pelindungan data pribadi (UU No. 27 Tahun 2022)** | Foto, lokasi, dan kontak dapat memuat data pribadi. Transfer data ke penyedia AI | Minimisasi data (kirim hanya teks non-PII ke AI), persetujuan eksplisit untuk email kontak |
+| **Konten dan pencemaran nama baik** | Laporan dapat memuat tuduhan terhadap pihak tertentu | Moderasi sebelum tampil publik, instruksi AI netral, dan validator kata terlarang |
+| **Hak atas foto dan privasi pihak ketiga** | Foto bisa memuat wajah, pelat nomor, dan metadata lokasi perangkat | Hapus EXIF pada foto publik via Cloudinary dan sediakan alat blur manual untuk Admin |
+| **Retensi dan hak subjek data** | Hak hapus vs audit log yang tidak dapat diubah | Aktor disimpan secara pseudonim di audit log sehingga PII kontak dapat dihapus terpisah |
 
 # **15\. Implementasi, Adopsi, dan Matriks Keterlacakan**
 
-## **15.1 Pendekatan Bertahap \[Usulan BA\]**
+## **15.1 Pendekatan Rilis (Satu Fase Terpadu untuk MIA2026)**
 
-| Tahap | Tujuan bisnis | Isi |
+Untuk memaksimalkan dampak produk pada kompetisi **MIA2026**, seluruh fitur **F1 sampai F10** dibangun dalam **Fase 1 (MVP Utama)**:
+
+| Tahap | Tujuan | Cakupan Fitur |
 | :---- | :---- | :---- |
-| **Fase 0: Discovery** | Memvalidasi masalah dan kemitraan | Wawancara, audit kanal, jawaban pertanyaan terbuka, spike BMKG dan AI, kebijakan privasi dan konten |
-| **Fase 1: Pilot MVP Core** | Membuktikan alur laporan sampai Selesai | F1 sampai F8 pada wilayah terbatas dengan kapasitas Admin yang jelas |
-| **Fase 2: MVP+** | Menambah nilai analitik dan pengawasan | F9 dan F10, perluasan wilayah |
+| **Fase 1: MVP Utama (MIA2026)** | Membuktikan alur pelaporan warga, bantuan AI aman, moderasi Admin, tindak lanjut instansi, analitik cuaca, dan verifikasi komunitas secara utuh | **F1** (Form & Geotagging), **F2** (AI Draft & Fallback), **F3** (Panel Sanding & Persetujuan), **F4** (Peta Publik, +1, Tag), **F5** (Moderasi & Eskalasi Admin), **F6** (Portal Instansi), **F7** (Audit Trail), **F8** (Pelacakan & Notifikasi), **F9** (Weather-Road Intelligence), dan **F10** (Community Sign-Off) |
 
-## **15.2 Adopsi dan Manajemen Perubahan**
-
-* Libatkan petugas PUPR sejak Discovery agar platform dirasakan sebagai alat bantu, bukan sorotan.
-
-* Siapkan panduan singkat dan sesi pelatihan untuk petugas dan Admin.
-
-* Komunikasikan kepada warga apa yang dapat dan tidak dapat dijanjikan platform.
-
-* Mulai dari wilayah pilot dan kumpulkan umpan balik sebelum meluas.
-
-* Tentukan pemilik komunikasi publik dan penanganan isu bila ada laporan viral atau sengketa.
-
-## **15.3 Matriks Keterlacakan Tujuan Bisnis ke Kebutuhan dan Fitur**
+## **15.2 Matriks Keterlacakan Tujuan Bisnis ke Kebutuhan dan Fitur**
 
 | Tujuan bisnis | Kebutuhan bisnis | Fitur PRD |
 | :---- | :---- | :---- |
@@ -417,30 +354,26 @@ Harga dan kuota tiap layanan belum diverifikasi. Angka biaya diisi sponsor pada 
 | **BO-5 Prioritisasi berbasis cuaca** | BR-14, BR-15 | F9 |
 | **BO-6 Akuntabilitas dan kepatuhan** | BR-05, BR-09, BR-11, BR-17, BR-18, BR-22 | F3, F5, F6, F7 |
 
-# **16\. Keputusan, Asumsi Kerja, dan Persetujuan**
+# **16\. Keputusan Kunci dan Pengesahan Dokumen**
 
-Pertanyaan teknis dan fungsional ada di PRD Bagian 10\. Pertanyaan **tingkat bisnis** berikut kini memakai **rekomendasi default PM sebagai keputusan**. Status **Diputuskan** berarti berlaku sekarang. Status **Asumsi kerja** berarti bergantung pada fakta di luar kendali tim produk (kemitraan, pendanaan, kapasitas, hukum, akses data) sehingga dipakai sementara dan perlu dikonfirmasi sponsor.
+Seluruh pertanyaan bisnis pada versi draf telah dikunci menjadi keputusan tetap untuk proyek **MIA2026**:
 
-| No | Pertanyaan | Keputusan (rekomendasi PM) | Prioritas | Status |
-| :---- | :---- | :---- | :---- | :---- |
-| **OQ-B01** | Siapa sponsor, pemilik operasional, dan badan hukum atau organisasi di balik SIJAGO? | Sponsor menunjuk pemilik dan menyiapkan kebijakan dasar sebelum pilot. | Blocker | Asumsi kerja |
-| **OQ-B02** | Apakah sudah ada komitmen atau MoU dengan Dinas PUPR Kota Bogor dan apa bentuk kerja samanya? | Mulai tanpa MoU lewat email eskalasi sambil menjajaki kerja sama formal. | Blocker | Asumsi kerja |
-| **OQ-B03** | Apa sumber pendanaan dan model keberlanjutan setelah pilot? | Pilot berskala kecil dengan biaya per laporan dihitung dahulu. | Blocker | Asumsi kerja |
-| **OQ-B04** | Berapa kapasitas Admin dan SLA verifikasi yang dapat dijamin? | SLA 2 hari kerja dan wilayah pilot disesuaikan kapasitas. | High | Asumsi kerja |
-| **OQ-B05** | Apakah laporan yang belum diverifikasi boleh tampil publik? | Tidak, hanya yang terverifikasi. | High | Diputuskan |
-| **OQ-B06** | Apakah identitas pelapor boleh diteruskan ke instansi? | Tidak, kecuali pelapor setuju. | High | Diputuskan |
-| **OQ-B07** | Apakah akses dan lisensi data BMKG sudah dipastikan untuk penggunaan ini? | Lakukan spike dan tinjau syarat sebelum komitmen Fase 2\. | High | Asumsi kerja |
-| **OQ-B08** | Siapa pemilik data dan bagaimana kebijakan retensi serta transfer data ke penyedia pihak ketiga? | Konsultasi hukum, minimisasi data, dan pseudonimisasi. | High | Asumsi kerja |
-| **OQ-B09** | Adakah data aduan jalan rusak dari kanal eksisting untuk baseline? | Kumpulkan pada Fase 0\. | Medium | Asumsi kerja |
-| **OQ-B10** | Apakah ini produk yang akan diluncurkan nyata atau proyek akademik atau prototipe? | Susun untuk peluncuran nyata dan tandai bagian yang cukup berupa prototipe. | High | Asumsi kerja |
-
-## **Persetujuan**
-
-| Peran | Nama | Tanda tangan | Tanggal |
+| No | Topik Keputusan | Keputusan Final | Status |
 | :---- | :---- | :---- | :---- |
-| **Sponsor bisnis** |  |  |  |
-| **Perwakilan Dinas PUPR (jika terlibat)** |  |  |  |
-| **Product Manager / Business Analyst** |  |  |  |
-| **Pemimpin Engineering** |  |  |  |
-| **Penasihat hukum / privasi** |  |  |  |
+| **OQ-B01** | Pemilik dokumen, tim pengembang, dan sponsor bisnis | Proyek independen untuk kompetisi **MIA2026** tanpa sponsor/organisasi eksternal. Pemilik dokumen: **Sabira** (PM & UI/UX Designer) dan **Boby** (System Architect & Fullstack Developer). | Diputuskan |
+| **OQ-B02** | Bentuk kerja sama dengan Dinas PUPR Kota Bogor | Kemitraan instansi **disimulasikan secara penuh** di dalam platform untuk mendemonstrasikan alur *end-to-end*. | Diputuskan |
+| **OQ-B03** | Anggaran dan model infrastruktur | Menggunakan **100% layanan Free Tier** (Vercel, Render, Neon, Cloudinary, Resend, OSM, API Cuaca Gratis) tanpa tabel anggaran biaya. | Diputuskan |
+| **OQ-B04** | Kapasitas Admin dan SLA verifikasi | SLA verifikasi ditetapkan 2 hari kerja dalam simulasi operasional. | Diputuskan |
+| **OQ-B05** | Visibilitas laporan yang belum diverifikasi | Tidak tampil publik. Hanya laporan berstatus **Terverifikasi** ke atas yang tampil di peta publik. | Diputuskan |
+| **OQ-B06** | Kerahasiaan identitas pelapor | Identitas pelapor tidak diteruskan ke instansi kecuali pelapor menyetujui secara eksplisit. | Diputuskan |
+| **OQ-B07** | Sumber data cuaca untuk *Weather-Road Intelligence* | Menggunakan daftar API cuaca gratis (BMKG Open Data, Open-Meteo, NASA POWER, OpenWeatherMap Free) yang di-ingest dan disimpan sebagai snapshot. | Diputuskan |
+| **OQ-B08** | Kebijakan privasi, penyimpanan foto, dan AI | Teks non-PII diproses oleh `openai gpt-6-luna` (*reasoning medium*). Foto disimpan di **Cloudinary** dengan penghapusan EXIF untuk publik. | Diputuskan |
+| **OQ-B09** | Cakupan fitur Fase 1 (MVP Utama) | **F9 (Weather-Road Intelligence)** dan **F10 (Community Sign-Off)** ditarik masuk ke **Fase 1** bersama F1–F8. | Diputuskan |
+| **OQ-B10** | Konteks penggunaan produk | Digunakan untuk kompetisi **MIA2026** dengan kualitas arsitektur setara produk siap rilis (*production-grade architecture*). | Diputuskan |
 
+## **Pengesahan Tim Proyek**
+
+| Peran | Nama | Tanggal |
+| :---- | :---- | :---- |
+| **Product Manager & UI/UX Designer** | **Sabira** | 25 Oktober 2026 |
+| **System Architect & Fullstack Developer** | **Boby** | 25 Oktober 2026 |
