@@ -1,5 +1,7 @@
 **BUSINESS REQUIREMENTS DOCUMENT**
 
+> Pembaruan cakupan: bantuan pengisian dari foto kini diizinkan secara terbatas atas permintaan pemilik proyek. Lihat [Addendum bantuan foto](AI_PHOTO_ASSISTANCE.md) untuk perubahan atas BRL-02 dan daftar di luar cakupan di bawah.
+
 **SIJAGO**
 
 **Sistem Jalan Bogor**
