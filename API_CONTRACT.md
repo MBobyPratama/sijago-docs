@@ -347,3 +347,17 @@ Menyediakan data korelasi curah hujan (BMKG / Open-Meteo) dengan frekuensi kerus
   }
 }
 ```
+
+### Bantuan pengisian dari foto (addendum)
+
+`POST /v1/ai/analyze-photo` menerima `{ image: dataURL }` JPEG/PNG/WebP maksimal 2 MB, tanpa login; origin terpercaya dan rate limit 5 analisis berhasil/IP/15 menit serta 30 percobaan/IP/menit diterapkan; respons gagal tidak mengurangi jatah analisis berhasil. Respons `data` berisi `roadDamageVisible: boolean`, `category: enum | null`, `sizeClass: enum | null`, `condition: string`, `uncertainty: string`. Tidak mengubah laporan atau mengirim email. Validasi gagal: 400; batas permintaan: 429; AI tidak tersedia/gagal: 503. Warga harus meninjau dan menerapkan hasil secara eksplisit. Lihat `AI_PHOTO_ASSISTANCE.md` untuk perubahan cakupan BRL-02.
+
+Moderasi foto wajib: registrasi upload, penyimpanan fakta, dan pengiriman final memeriksa asset Cloudinary di backend. `PHOTO_UNSAFE`/`PHOTO_NOT_RELEVANT` menolak foto; layanan gagal menahan proses. `POST /v1/ai/analyze-photo` juga menerima `{photoId: UUID}` sebagai alternatif data URL; foto diambil dari penyimpanan server, diperiksa, lalu saran dibuat hanya atas permintaan. Kedua bentuk payload tidak boleh dikirim sekaligus.
+
+### Saran duplikat admin
+
+`POST /v1/admin/reports/:id/duplicate-suggestions` body `{}`; ADMIN/SUPER_ADMIN, origin terpercaya. Maksimal 10 pemeriksaan berhasil per akun/15 menit, kegagalan tidak dihitung. Pencarian PostGIS radius 100 m, maksimal 3 kandidat aktif. AI multimodal hanya berjalan setelah tombol ditekan; saran tidak mengubah data laporan. Respons: reportId, radiusMeters, candidateLimit, candidatesFound, evaluated, skipped, checkedAt, cached, sourcePhotoUrl, suggestions. Setiap saran memuat kandidat, jarak, bukti foto/keterangan/waktu, match (`LIKELY`/`POSSIBLE`) dan alasan. Keluaran `DIFFERENT` tidak ditawarkan sebagai tiket induk. Cache singkat 5 menit per proses, validasi ID ketat, foto tidak tersedia/gagal diperiksa ditandai sebagai kandidat terlewat. Penggabungan tetap menggunakan endpoint merge yang ada dan konfirmasi admin.
+
+### Ringkasan laporan untuk petugas
+
+`POST /v1/admin/reports/:id/summary` (ADMIN/SUPER_ADMIN) dan `POST /v1/agency/reports/:id/summary` (petugas instansi yang masih memiliki penugasan), body `{}`, origin terpercaya. Tidak mengubah laporan. Response data: reportId, ticketCode, status, method (`AI_EXTRACTIVE`/`BASIC`), cached, notice, fields, highlights, checkedAt, factsUpdatedAt. Model hanya memilih kutipan dari Fakta Asal; keterangan singkat tidak memanggil AI. Provider gagal menghasilkan ringkasan dasar yang diberi label berbeda. Maksimal 10 pemuatan berhasil/akun/15 menit dan 30 percobaan/akun/menit; akses dicek sebelum cache dan sesudah pemrosesan. Perubahan data selama pemrosesan menghasilkan 409; tanpa akses 403; laporan tidak ada 404. Lihat `AI_STAFF_SUMMARY.md`.
