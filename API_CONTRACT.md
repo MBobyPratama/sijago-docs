@@ -1,6 +1,6 @@
 # **REST API CONTRACT (`/v1`)**
 
-**SIJAGO (Sistem Jalan Bogor)** — Spesifikasi Antarmuka Pemrograman Aplikasi (Multirepo Frontend <-> Backend)
+**SIJAGO (Sistem Jalan Bogor)** â€” Spesifikasi Antarmuka Pemrograman Aplikasi (Multirepo Frontend <-> Backend)
 
 | Atribut | Keterangan |
 | :---- | :---- |
@@ -54,7 +54,7 @@ Karena SIJAGO menggunakan arsitektur **Multirepo** (`sijago-frontend` di Vercel 
 
 ---
 
-## **2. Ringkasan Endpoint per Fitur PRD (F1 – F10)**
+## **2. Ringkasan Endpoint per Fitur PRD (F1 â€“ F10)**
 
 | Modul / Fitur | Method & Path | Aktor | Deskripsi Singkat |
 | :---- | :---- | :---- | :---- |
@@ -186,7 +186,7 @@ Memanggil model **OpenAI `gpt-6-luna`** dengan `reasoning_effort: "medium"` (FR-
   "data": {
     "draftId": "d1122334-e29b-41d4-a716-446655449999",
     "sourceType": "AI",
-    "permanentLabel": "✨ [Draf Dibantu AI]",
+    "permanentLabel": "âœ¨ [Draf Dibantu AI]",
     "title": "Lubang Jalan Berukuran 80x60x12 cm di Depan Pintu 1 Kebun Raya Bogor",
     "body": "Dilaporkan kerusakan jalan kategori lubang berukuran panjang 80 cm, lebar 60 cm, dan kedalaman 12 cm (kelas sedang) dengan patokan di depan gerbang masuk Kebun Raya Bogor Pintu 1, lajur kiri arah BTM. Kerusakan ditemukan pada 25 Oktober 2026 pukul 16.15 WIB. Kondisi lubang tertutup genangan air saat hujan serta berdampak membahayakan pengendara roda dua dan menimbulkan kemacetan.",
     "modelInfo": {
@@ -207,7 +207,7 @@ Memanggil model **OpenAI `gpt-6-luna`** dengan `reasoning_effort: "medium"` (FR-
   "data": {
     "draftId": "d9988776-e29b-41d4-a716-446655441111",
     "sourceType": "TEMPLATE",
-    "permanentLabel": "📄 [Draf Template]",
+    "permanentLabel": "ðŸ“„ [Draf Template]",
     "title": "[LUBANG - SEDANG] Laporan Kerusakan Jalan di Depan Pintu 1 Kebun Raya Bogor",
     "body": "Laporan kerusakan jalan kategori LUBANG (kelas ukuran SEDANG: panjang 80 cm, lebar 60 cm, kedalaman 12 cm). Patokan lokasi: Depan gerbang masuk Kebun Raya Bogor Pintu 1, lajur kiri arah BTM. Waktu ditemukan: 25 Oktober 2026 16:15 WIB. Dampak: Membahayakan pengendara roda dua, Menimbulkan macet. Catatan pelapor: Lubang cukup dalam dan sering tertutup genangan air saat hujan sore.",
     "modelInfo": null,
@@ -340,8 +340,8 @@ Menyediakan data korelasi curah hujan (BMKG / Open-Meteo) dengan frekuensi kerus
         "avgRainfallMm": 85.2,
         "recurrenceCount": 2,
         "isRedZone": true,
-        "triggerRuleText": "≥ 5 laporan terverifikasi dalam radius 250m dengan curah hujan > 50 mm & ≥ 1 kasus kambuhan dalam 90 hari.",
-        "indicativeRecommendation": "[Rekomendasi Indikatif — Bukan Pengganti Survei Teknis] Evaluasi kapasitas saluran drainase tepi jalan dan pertimbangkan perkerasan kaku (rigid pavement / beton) untuk mencegah pengelupasan aspal berulang akibat genangan."
+        "triggerRuleText": "â‰¥ 5 laporan terverifikasi dalam radius 250m dengan curah hujan > 50 mm & â‰¥ 1 kasus kambuhan dalam 90 hari.",
+        "indicativeRecommendation": "[Rekomendasi Indikatif â€” Bukan Pengganti Survei Teknis] Evaluasi kapasitas saluran drainase tepi jalan dan pertimbangkan perkerasan kaku (rigid pavement / beton) untuk mencegah pengelupasan aspal berulang akibat genangan."
       }
     ]
   }
@@ -358,6 +358,6 @@ Moderasi foto wajib: registrasi upload, penyimpanan fakta, dan pengiriman final 
 
 `POST /v1/admin/reports/:id/duplicate-suggestions` body `{}`; ADMIN/SUPER_ADMIN, origin terpercaya. Maksimal 10 pemeriksaan berhasil per akun/15 menit, kegagalan tidak dihitung. Pencarian PostGIS radius 100 m, maksimal 3 kandidat aktif. AI multimodal hanya berjalan setelah tombol ditekan; saran tidak mengubah data laporan. Respons: reportId, radiusMeters, candidateLimit, candidatesFound, evaluated, skipped, checkedAt, cached, sourcePhotoUrl, suggestions. Setiap saran memuat kandidat, jarak, bukti foto/keterangan/waktu, match (`LIKELY`/`POSSIBLE`) dan alasan. Keluaran `DIFFERENT` tidak ditawarkan sebagai tiket induk. Cache singkat 5 menit per proses, validasi ID ketat, foto tidak tersedia/gagal diperiksa ditandai sebagai kandidat terlewat. Penggabungan tetap menggunakan endpoint merge yang ada dan konfirmasi admin.
 
-### Ringkasan laporan untuk petugas
+### Ringkasan antrean untuk petugas instansi
 
-`POST /v1/admin/reports/:id/summary` (ADMIN/SUPER_ADMIN) dan `POST /v1/agency/reports/:id/summary` (petugas instansi yang masih memiliki penugasan), body `{}`, origin terpercaya. Tidak mengubah laporan. Response data: reportId, ticketCode, status, method (`AI_EXTRACTIVE`/`BASIC`), cached, notice, fields, highlights, checkedAt, factsUpdatedAt. Model hanya memilih kutipan dari Fakta Asal; keterangan singkat tidak memanggil AI. Provider gagal menghasilkan ringkasan dasar yang diberi label berbeda. Maksimal 10 pemuatan berhasil/akun/15 menit dan 30 percobaan/akun/menit; akses dicek sebelum cache dan sesudah pemrosesan. Perubahan data selama pemrosesan menghasilkan 409; tanpa akses 403; laporan tidak ada 404. Lihat `AI_STAFF_SUMMARY.md`.
+`POST /v1/agency/queue-summary`; hanya PETUGAS_INSTANSI dengan penugasan aktif. Body `{mode:"FILTER",query:"",status:"ALL",sort:"PRIORITY"}` atau `{mode:"SELECTED",reportIds:[UUID],sort:"PRIORITY"}`. Maksimal 25 laporan; filter mencari seluruh antrean, dengan total/included/truncated yang eksplisit. Statistik dihitung backend pada laporan yang disertakan; AI merangkum pola keterangan dengan minimal dua tiket sumber per pola. Respons mencakup stats, patterns, sources, method AI/BASIC, missingConditions dan checkedAt. Batas 10 respons berhasil/akun/15 menit, 30 percobaan/menit. Akses diperiksa sebelum/sesudah pemrosesan; perubahan sumber menghasilkan 409. Endpoint ringkasan satu laporan dihapus. Lihat `AI_STAFF_SUMMARY.md`. Analisis cuaca tetap tanpa AI.
